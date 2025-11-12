@@ -1,0 +1,30 @@
+// Simple demo serverless AI endpoint
+export default async function handler(req, res) {
+  const body = req.method === "POST" ? req.body : req.query;
+  const prompt = body.prompt || "Hello from POWANET demo.";
+  // If you set OPENAI_KEY in env, call real OpenAI:
+  const OPENAI_KEY = process.env.OPENAI_API_KEY;
+  if (OPENAI_KEY) {
+    try {
+      const r = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type":"application/json",
+          "Authorization": `Bearer ${OPENAI_KEY}`
+        },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }],
+          max_tokens: 200
+        })
+      });
+      const j = await r.json();
+      const reply = j.choices?.[0]?.message?.content || "OpenAI no reply.";
+      return res.status(200).json({ reply });
+    } catch (e) {
+      return res.status(200).json({ reply: "OpenAI error, using demo reply." });
+    }
+  }
+  // fallback demo reply
+  return res.status(200).json({ reply: `EGO (demo): Received: ${prompt}` });
+}
