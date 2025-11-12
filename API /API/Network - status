@@ -1,0 +1,9 @@
+// Example serverless function (Node)
+export default function handler(req, res) {
+  const { network = "CryptoNet", mode = "test" } = req.query || req.body || {};
+  // Simulate
+  const status = mode === "main" ? "Online" : "Testing";
+  const latency = `${Math.floor(12 + Math.random()*120)} ms`;
+  const block = Math.floor(800000 + Math.random()*20000);
+  res.status(200).json({ status, latency, block });
+}
